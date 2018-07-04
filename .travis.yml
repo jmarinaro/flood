@@ -1,17 +1,18 @@
 dist: trusty
-language: node_js
-node_js:
-  - "8"
-  - "9"
-  - "10"
-matrix:
-  fast_finish: true
-  allow_failures:
-  - node_js: 10
-before_script:
-  - cp config.template.js config.js
-script:
-  - npm run check-source-formatting
-  - npm run lint
-  - npm run test
-  - npm run build
+sudo: required
+
+jobs:
+  include:
+    - stage: build docker image
+      env:
+        - DOCKER_ORGANIZATION=jmarinaro
+        - DOCKER_REPOSITORY=flood
+      script:
+      - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin quay.io
+      - docker build -t quay.io/$DOCKER_ORGANIZATION/$DOCKER_REPOSITORY .
+      - docker tag quay.io/$DOCKER_ORGANIZATION/$DOCKER_REPOSITORY:latest quay.io/$DOCKER_ORGANIZATION/$DOCKER_REPOSITORY:$TRAVIS_BRANCH
+      - docker push quay.io/$DOCKER_ORGANIZATION/$DOCKER_REPOSITORY
+
+branches:
+  except:
+  - master
