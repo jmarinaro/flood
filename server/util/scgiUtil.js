@@ -25,10 +25,14 @@ const methodCall = (connectionMethod, methodName, parameters) => {
     }, 0);
 
     stream.write(`${headerLength}:${headerItems.join('')},${xml}`);
-
-    deserializer.deserializeMethodResponse(stream, (error, response) => {
-      if (error) return reject(error);
-      resolve(response);
+    var resp = [];
+    stream.on('data', function (data) {resp.push(data)} );
+    stream.on('error', function (error) {reject(error)});
+    stream.on('end', function() {
+        deserializer.deserializeMethodResponse(resp.join(''), (error, response) => {
+          if (error) return reject(error);
+          resolve(response);
+        });
     });
   });
 };
