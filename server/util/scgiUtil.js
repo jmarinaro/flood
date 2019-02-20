@@ -26,13 +26,17 @@ const methodCall = (connectionMethod, methodName, parameters) => {
 
     stream.write(`${headerLength}:${headerItems.join('')},${xml}`);
     var resp = [];
-    stream.on('data', function (data) {resp.push(data)} );
-    stream.on('error', function (error) {reject(error)});
+    stream.on('data', function(data) {
+      resp.push(data);
+    });
+    stream.on('error', function(error) {
+      reject(error);
+    });
     stream.on('end', function() {
-        deserializer.deserializeMethodResponse(resp.join(''), (error, response) => {
-          if (error) return reject(error);
-          resolve(response);
-        });
+      deserializer.deserializeMethodResponse(resp.join(''), (error, response) => {
+        if (error) return reject(error);
+        resolve(response);
+      });
     });
   });
 };
