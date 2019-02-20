@@ -10,6 +10,7 @@ WORKDIR $WORKDIR
 COPY package.json ./package.json
 COPY package-lock.json ./package-lock.json
 RUN apk add --no-cache --virtual=build-dependencies \
+    git \
     python \
     build-base && \
     npm install && \
